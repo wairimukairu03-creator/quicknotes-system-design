@@ -14,6 +14,11 @@ let memoryNotes = [
     title: "M-Pesa API integration",
     body: "Check connection timeouts for the Safaricom sandbox environment.",
   },
+  {
+    id: 2542,
+    title: "Mombasa Cold Storage Layout",
+    body: "Architecture plans for the new IoT sensors near the port docks.",
+  },
 ];
 
 async function makeRequest(url, options = {}) {
