@@ -1,38 +1,64 @@
-# Production API Specification
+# Production API Specifications
 
-### Endpoints and Payload Protocols
+### Endpoints
 
-#### 1. GET /api/v1/notes
+1. `GET /api/v1/notes` — Retrieves user notes.
+2. `POST /api/v1/notes` — Commits a new note configuration.
+3. `DELETE /api/v1/notes/:id` — Drops a note instance.
+4. `PUT /api/v1/notes/:id` — Overwrites title or body properties.
+5. `GET /api/v1/tags` — Fetches common categorization values.
+6. `POST /api/v1/users/register` — provisions access records.
 
-- **Description:** Retrieves a paginated chunk of localized user sync notes.
-- **Response Blueprint:**
+---
 
-```json
-[
-  {
-    "note_id": "qn_9081234",
-    "title": "M-Pesa Node Timeout Settings",
-    "body": "Increase timeout configs to 15000ms for high-traffic weekends.",
-    "created_at": "2026-10-19T01:22:00Z",
-    "updated_at": "2026-10-19T01:22:00Z"
-  }
-]
-```
+### Standard JSON Error Response Payloads
 
-#### 2. POST /api/v1/notes
-
-- **Description:** Commits a newly compiled note to the relational database clusters.
-- **Validation Constraint:** Title is mandatory, strictly verified up to a maximum threshold of **100 characters**.
-- **Request Payload Structure:**
+#### HTTP 400 Bad Request
 
 ```json
 {
-  "title": "Kilimani Node Verification",
-  "body": "Backup routines running cleanly on isolated channels."
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Validation Failed: Title parameter length exceeds 100 characters boundary constraint."
 }
 ```
 
-#### 3. DELETE /api/v1/notes/:id
+#### HTTP 401 Unauthorized
 
-- **Description:** Completely purges a target note record from active indexing clusters.
-- **Response Code:** `204 No Content` / `200 OK Status Ack`.
+```json
+{
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "Authentication signature dropped. Missing or expired M-Pesa bearer connection token."
+}
+```
+
+#### HTTP 403 Forbidden
+
+```json
+{
+  "status": 403,
+  "error": "Forbidden",
+  "message": "Access Denied: Current user does not possess authorization to drop this resource entity."
+}
+```
+
+#### HTTP 404 Not Found
+
+```json
+{
+  "status": 404,
+  "error": "Not Found",
+  "message": "Resource index target could not be resolved in the cluster network mapping."
+}
+```
+
+#### HTTP 500 Internal Server Error
+
+```json
+{
+  "status": 500,
+  "error": "Internal Server Error",
+  "message": "Nairobi cloud core gateway timed out while executing relational database cluster writes."
+}
+```

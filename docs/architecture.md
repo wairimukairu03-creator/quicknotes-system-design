@@ -1,19 +1,28 @@
-# Quicknotes Architecture Plan
+# Infrastructure Design Scheme & Topography
 
-This document explains how we are going to move Quicknotes from a simple browser application to a real service that can handle 1 million users without crashing.
+### Traffic Estimations for 1 Million Users
 
-## Simple System Flow
+- **Active Users Context:** Assuming 10% of users write notes daily (100,000 active posters).
+- **Writes Per Second (WPS):** 100,000 requests spread over a peak window of 4 hours (14,400 seconds) ≈ **7 Writes/Second**.
+- **Reads Per Second (RPS):** Assuming users review notes 5 times more frequently than they write them ≈ **35 Reads/Second**.
+- **Annual Storage Capacity Scaling:** 100,000 notes written daily _ 1KB average string packet footprint _ 365 days = **36.5 GB storage growth per year**.
 
-Instead of just running inside the browser, the app will now talk to a real backend system. Here is the basic flow of the setup:
+---
 
-- **Step 1 (The Frontend):** The user interacts with our `index.html` web page in their browser.
-- **Step 2 (The Traffic Controller):** A Load Balancer picks up the request and forwards it to an available application server so no single server gets overwhelmed.
-- **Step 3 (The Application Layer):** We run multiple copies of our backend server application side-by-side to process the incoming requests.
-- **Step 4 (The Database & Cache):**
-  - Frequent note requests are temporarily saved in a fast **Redis Cache** so the system doesn't have to look them up from the main database every single time.
-  - New notes are written directly to a primary **MySQL Database**, which syncs the data across secondary read nodes to keep loading speeds snappy.
+### Explicit Network Flow Step Mapping
 
-## Why This Simple Plan Works for 1 Million Users
+#### 1. Fetch Request Execution Flow (GET)
 
-1.  **If the servers get slow, we add more:** Because the servers don't store files locally, we can easily turn on extra backend server copies whenever traffic spikes.
-2.  **We protect the database:** Storing popular notes in the fast cache means our main database stays lightweight and responsive, preventing system slowdowns.
+1. **DNS Lookup:** Browser matches hostname coordinates through localized ISP servers.
+2. **CDN Gateway:** Request hits Edge Cloudflare servers to extract cache assets instantly.
+3. **Load Balancer (NGINX):** Incoming requests travel across available application instances using round-robin flow algorithms.
+4. **Application Node Worker Queues:** Node workers dispatch tasks to complete queries without locking standard execution workflows.
+5. **Read Replicas:** Select actions access secondary relational read nodes to fetch active note indexes while keeping traffic off primary database storage layers.
+
+#### 2. Submission Post Pipeline (POST)
+
+1. **Client Submission:** Form triggers a payload check and serializes user note fields into JSON blocks.
+2. **CDN & Firewall Validation:** Request is authorized at reverse proxies.
+3. **Application Routing Node:** Server extracts attributes and ensures structural compliance constraints are met.
+4. **Primary Database Storage Cluster:** Session opens transactional writes on primary database layers.
+5. **Replication Event:** Master updates sync changes downstream to read replicas instantly.

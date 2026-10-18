@@ -1,28 +1,40 @@
-# Database Architecture & Storage Schemes
+# Data Model Specification
 
-### Relational Table Design: `notes`
+### Storage Solution Justification: SQL vs. NoSQL
 
-| Field Name   | Data Type    | Constraints / Rules                         |
-| :----------- | :----------- | :------------------------------------------ |
-| `note_id`    | VARCHAR(36)  | PRIMARY KEY, UUID Generation                |
-| `user_id`    | INT          | FOREIGN KEY, Indexing cluster tracking      |
-| `title`      | VARCHAR(100) | NOT NULL, Checked length <= 100 characters  |
-| `body`       | TEXT         | Nullable, Core unstructured context payload |
-| `created_at` | TIMESTAMP    | DEFAULT CURRENT_TIMESTAMP                   |
-| `updated_at` | TIMESTAMP    | DEFAULT CURRENT_TIMESTAMP ON UPDATE         |
+For a note-taking application handling 1 million concurrent users, a relational database (SQL) engine like PostgreSQL is selected. Quicknotes relies heavily on structured constraints (like strict character boundaries for titles) and clear identity validation across accounts. SQL handles ACID compliance reliably, ensuring notes are never lost or orphaned during unexpected node connections.
 
-### Entity Relationship Model Constraints
+---
 
-```sql
-CREATE TABLE notes (
-    note_id VARCHAR(36) PRIMARY KEY,
-    user_id INT NOT NULL,
-    title VARCHAR(100) NOT NULL CHECK (CHAR_LENGTH(title) <= 100),
-    body TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
-);
+### Database Schemas
 
-CREATE INDEX idx_user_notes ON notes(user_id);
-```
+#### 1. `users` Table
+
+| Field Name | Data Type    | Constraints / Rules         |
+| :--------- | :----------- | :-------------------------- |
+| `user_id`  | INT          | PRIMARY KEY, AUTO_INCREMENT |
+| `username` | VARCHAR(50)  | UNIQUE, NOT NULL            |
+| `email`    | VARCHAR(100) | UNIQUE, NOT NULL            |
+
+#### 2. `notes` Table
+
+| Field Name | Data Type    | Constraints / Rules                     |
+| :--------- | :----------- | :-------------------------------------- |
+| `note_id`  | VARCHAR(36)  | PRIMARY KEY, UUID                       |
+| `user_id`  | INT          | FOREIGN KEY references `users(user_id)` |
+| `title`    | VARCHAR(100) | NOT NULL (Length validation <= 100)     |
+| `body`     | TEXT         | NULL (Optional field parameter)         |
+
+#### 3. `tags` Table
+
+| Field Name | Data Type   | Constraints / Rules         |
+| :--------- | :---------- | :-------------------------- |
+| `tag_id`   | INT         | PRIMARY KEY, AUTO_INCREMENT |
+| `tag_name` | VARCHAR(30) | UNIQUE, NOT NULL            |
+
+#### 4. `note_tags` (Many-to-Many Relationship Mapping Table)
+
+| Field Name | Data Type   | Constraints / Rules                     |
+| :--------- | :---------- | :-------------------------------------- |
+| `note_id`  | VARCHAR(36) | FOREIGN KEY references `notes(note_id)` |
+| `tag_id`   | INT         | FOREIGN KEY references `tags(tag_id)`   |
