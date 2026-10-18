@@ -78,6 +78,12 @@ async function handleLoadNotes() {
   try {
     const data = await makeRequest(`${api_url}?_limit=10`);
 
+    const mappedNotes = data.map((item, index) => ({
+      id: item.id,
+      title: `System Node ${item.id}: ${item.title.substring(0, 20)}...`,
+      body: `[Log Context: Konza Technopolis Branch] — ${item.body}`,
+    }));
+
     memoryNotes = [...memoryNotes, ...mappedNotes];
     renderNotes();
     setUiState(
