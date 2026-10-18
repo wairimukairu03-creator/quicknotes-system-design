@@ -154,7 +154,10 @@ async function handleCreateNote(e) {
 }
 
 
-
+async function handleDelete(noteId) {
+  const confirmDelete = confirm(
+    "Je, uko na uhakika unataka kufuta hii record?",
+  );
   if (!confirmDelete) return;
 
   setUiState(
