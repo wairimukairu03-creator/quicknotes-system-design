@@ -16,9 +16,12 @@ This iteration builds out system resilience optimized for local connectivity pro
 
 All application files live cleanly inside the mandated directory structure:
 
-- `docs/index.html` — Containing valid HTML5 semantic layout structures (`<form id="note-form">`, `<input id="title-input">`, `<textarea id="body-input">`, and `<ul id="notes-list">`).
-- `docs/style.css` — Core responsive styling mapping out intuitive visual states.
-- `docs/api.js` — Client engine interacting with remote infrastructure.
+- [docs/index.html](./docs/index.html) — Containing valid HTML5 semantic layout structures.
+- [docs/style.css](./docs/style.css) — Core responsive styling mapping out intuitive visual states.
+- [docs/api.js](./docs/api.js) — Client engine interacting with remote infrastructure.
+- [docs/api-design.md](./docs/api-design.md) — Production API specification and payload protocols.
+- [docs/data-model.md](./docs/data-model.md) — Relational table designs and entity configurations.
+- [docs/architecture.md](./docs/architecture.md) — System flow topography and scaling plans.
 
 ### 2. Functional API Implementation
 
