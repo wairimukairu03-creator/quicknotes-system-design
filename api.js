@@ -1,7 +1,6 @@
-// Constants required by assignment parameters
 const api_url = "https://jsonplaceholder.typicode.com/posts";
 
-// DOM Elements
+
 const loadBtn = document.getElementById("load-btn");
 const statusText = document.getElementById("status");
 const noteForm = document.getElementById("note-form");
@@ -10,21 +9,17 @@ const bodyInput = document.getElementById("body-input");
 const submitBtn = document.getElementById("submit-btn");
 const notesList = document.getElementById("notes-list");
 
-// Local UI array to manage states dynamically
+
 let memoryNotes = [
   {
     id: 2541,
     title: "M-Pesa API integration",
     body: "Check connection timeouts for the Safaricom sandbox environment.",
   },
-  {
-    id: 2542,
-    title: "Mombasa Cold Storage Layout",
-    body: "Architecture plans for the new IoT sensors near the port docks.",
-  },
+  
 ];
 
-// Reusable Async Request Wrapper with strict validation and error throws
+
 async function makeRequest(url, options = {}) {
   const response = await fetch(url, options);
   if (!response.ok) {
@@ -35,18 +30,17 @@ async function makeRequest(url, options = {}) {
   return await response.json();
 }
 
-// Global UI State Manager for Loading/Interactive Locks
+
 function setUiState(isLoading, statusMessage, statusType = "idle") {
-  // Buttons disabled while requests are running
+  
   loadBtn.disabled = isLoading;
   submitBtn.disabled = isLoading;
 
-  // Manage Loading, Success, Error states
+  
   statusText.innerText = statusMessage;
   statusText.className = statusType;
 }
 
-// Render Engine for UI
 function renderNotes() {
   notesList.innerHTML = "";
 
@@ -73,7 +67,7 @@ function renderNotes() {
   });
 }
 
-// Prevent Cross-site Scripting via text inputs
+
 function escapeHtml(text) {
   return text
     .toString()
@@ -82,11 +76,7 @@ function escapeHtml(text) {
     .replace(/>/g, "&gt;");
 }
 
-/* ==========================================================================
-   TASK OPERATIONS (GET, POST, DELETE)
-   ========================================================================== */
 
-// Task 1: API Client - Load Notes (GET)
 async function handleLoadNotes() {
   setUiState(
     true,
@@ -97,14 +87,8 @@ async function handleLoadNotes() {
   try {
     const data = await makeRequest(`${api_url}?_limit=10`);
 
-    // Transform placeholder API into relevant Kenyan business test scenarios
-    const mappedNotes = data.map((item, index) => ({
-      id: item.id,
-      title: `System Node ${item.id}: ${item.title.substring(0, 20)}...`,
-      body: `[Log Context: Konza Technopolis Branch] — ${item.body}`,
-    }));
 
-    // Merge incoming assets with existing configurations
+    
     memoryNotes = [...memoryNotes, ...mappedNotes];
     renderNotes();
     setUiState(
@@ -121,26 +105,19 @@ async function handleLoadNotes() {
   }
 }
 
-// Task 2: API Client - Save Note (POST)
+
 async function handleCreateNote(e) {
   e.preventDefault();
 
   const title = titleInput.value.trim();
   const body = bodyInput.value.trim();
 
-  // STRICT VALIDATION: (A title is required, with a maximum of 100 characters)
+  
   if (!title) {
     setUiState(false, "Kosa! Note title cannot be blank.", "error");
     return;
   }
-  if (title.length > 100) {
-    setUiState(
-      false,
-      `Kosa! Title is too long (${title.length}/100 chars). Reduce text size.`,
-      "error",
-    );
-    return;
-  }
+  
 
   setUiState(
     true,
@@ -155,9 +132,9 @@ async function handleCreateNote(e) {
       headers: { "Content-type": "application/json; charset=UTF-8" },
     });
 
-    // Add server response locally to list view
+
     const newNote = {
-      id: result.id + Math.floor(Math.random() * 1000), // Ensure local unique variant ID keys
+      id: result.id + Math.floor(Math.random() * 1000), 
       title: title,
       body: body,
     };
@@ -166,16 +143,11 @@ async function handleCreateNote(e) {
     renderNotes();
     noteForm.reset();
     setUiState(false, "Note secure! Document updated dynamically.", "success");
-  } catch (error) {
-    setUiState(false, `Failed to submit data block: ${error.message}`, "error");
-  }
+ 
 }
 
-// Task 3: Client Component - Remove Item (DELETE)
-async function handleDelete(noteId) {
-  const confirmDelete = confirm(
-    "Je, uko na uhakika unataka kufuta hii record?",
-  );
+
+
   if (!confirmDelete) return;
 
   setUiState(
@@ -185,12 +157,11 @@ async function handleDelete(noteId) {
   );
 
   try {
-    // Issue system delete call tracking mock location endpoints
     await makeRequest(`${api_url}/${noteId < 100 ? noteId : 1}`, {
       method: "DELETE",
     });
 
-    // Filter instance out of structural memory arrays
+    
     memoryNotes = memoryNotes.filter((note) => note.id !== noteId);
     renderNotes();
     setUiState(
@@ -203,9 +174,8 @@ async function handleDelete(noteId) {
   }
 }
 
-// Event Triggers and Initial Boot Execution Setup
+
 loadBtn.addEventListener("click", handleLoadNotes);
 noteForm.addEventListener("submit", handleCreateNote);
 
-// Seed mock dashboard instances automatically on application start
 renderNotes();
