@@ -1,6 +1,5 @@
 const api_url = "https://jsonplaceholder.typicode.com/posts";
 
-
 const loadBtn = document.getElementById("load-btn");
 const statusText = document.getElementById("status");
 const noteForm = document.getElementById("note-form");
@@ -9,16 +8,13 @@ const bodyInput = document.getElementById("body-input");
 const submitBtn = document.getElementById("submit-btn");
 const notesList = document.getElementById("notes-list");
 
-
 let memoryNotes = [
   {
     id: 2541,
     title: "M-Pesa API integration",
     body: "Check connection timeouts for the Safaricom sandbox environment.",
   },
-  
 ];
-
 
 async function makeRequest(url, options = {}) {
   const response = await fetch(url, options);
@@ -30,13 +26,10 @@ async function makeRequest(url, options = {}) {
   return await response.json();
 }
 
-
 function setUiState(isLoading, statusMessage, statusType = "idle") {
-  
   loadBtn.disabled = isLoading;
   submitBtn.disabled = isLoading;
 
-  
   statusText.innerText = statusMessage;
   statusText.className = statusType;
 }
@@ -67,7 +60,6 @@ function renderNotes() {
   });
 }
 
-
 function escapeHtml(text) {
   return text
     .toString()
@@ -75,7 +67,6 @@ function escapeHtml(text) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 }
-
 
 async function handleLoadNotes() {
   setUiState(
@@ -87,8 +78,6 @@ async function handleLoadNotes() {
   try {
     const data = await makeRequest(`${api_url}?_limit=10`);
 
-
-    
     memoryNotes = [...memoryNotes, ...mappedNotes];
     renderNotes();
     setUiState(
@@ -105,14 +94,12 @@ async function handleLoadNotes() {
   }
 }
 
-
 async function handleCreateNote(e) {
   e.preventDefault();
 
   const title = titleInput.value.trim();
   const body = bodyInput.value.trim();
 
-  
   if (!title) {
     setUiState(false, "Kosa! Note title cannot be blank.", "error");
     return;
@@ -139,9 +126,8 @@ async function handleCreateNote(e) {
       headers: { "Content-type": "application/json; charset=UTF-8" },
     });
 
-
     const newNote = {
-      id: result.id + Math.floor(Math.random() * 1000), 
+      id: result.id + Math.floor(Math.random() * 1000),
       title: title,
       body: body,
     };
@@ -150,9 +136,10 @@ async function handleCreateNote(e) {
     renderNotes();
     noteForm.reset();
     setUiState(false, "Note secure! Document updated dynamically.", "success");
- 
+  } catch (error) {
+    setUiState(false, `Failed to submit data block: ${error.message}`, "error");
+  }
 }
-
 
 async function handleDelete(noteId) {
   const confirmDelete = confirm(
@@ -171,7 +158,6 @@ async function handleDelete(noteId) {
       method: "DELETE",
     });
 
-    
     memoryNotes = memoryNotes.filter((note) => note.id !== noteId);
     renderNotes();
     setUiState(
@@ -183,7 +169,6 @@ async function handleDelete(noteId) {
     setUiState(false, `Error dropping data node: ${error.message}`, "error");
   }
 }
-
 
 loadBtn.addEventListener("click", handleLoadNotes);
 noteForm.addEventListener("submit", handleCreateNote);
