@@ -117,7 +117,14 @@ async function handleCreateNote(e) {
     setUiState(false, "Kosa! Note title cannot be blank.", "error");
     return;
   }
-  
+  if (title.length > 100) {
+    setUiState(
+      false,
+      `Kosa! Title is too long (${title.length}/100 chars). Reduce text size.`,
+      "error",
+    );
+    return;
+  }
 
   setUiState(
     true,
